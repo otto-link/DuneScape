@@ -66,6 +66,17 @@ public:
   }
 
   /**
+   * @brief Set the array shape.
+   *
+   * @param new_shape New shape.
+   */
+  void set_shape(std::vector<int> new_shape)
+  {
+    this->shape = new_shape;
+    this->vector.resize(this->shape[0] * this->shape[1]);
+  }
+
+  /**
    * @brief Display a bunch of infos on the array.
    *
    */
@@ -99,6 +110,21 @@ public:
    * @param seed Random number seed.
    */
   void randomize(int a, int b, uint seed);
+
+  /**
+   * @brief Convert array to a 8 bit grayscale image.
+   *
+   * @return std::vector<uint8_t> Image.
+   */
+  std::vector<uint8_t> to_img_8bit_grayscale();
+
+  /**
+   * @brief Convert array to a 8 bit RGB image using the `nipy spectral`
+   * colormap.
+   *
+   * @return std::vector<uint8_t> Image.
+   */
+  std::vector<uint8_t> to_img_8bit_nipy();
 
   /**
    * @brief Export array as png image file.

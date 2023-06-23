@@ -19,22 +19,12 @@
 #include "core/array.hpp"
 
 #define SHADOW_SLOPE 0.8038475772933681f // == 3 * tan(15 / 180 * pi)
-#define DI_MOORE_DOWN                                                          \
-  {                                                                            \
-    1, 0, 0, 1, 1                                                              \
-  }
-#define DJ_MOORE_DOWN                                                          \
-  {                                                                            \
-    0, 1, -1, -1, 1                                                            \
-  }
-#define DI_MOORE_UP                                                            \
-  {                                                                            \
-    -1, 0, 0, -1, -1                                                           \
-  }
-#define DJ_MOORE_UP                                                            \
-  {                                                                            \
-    0, 1, -1, -1, 1                                                            \
-  }
+// clang-format off
+#define DI_MOORE_DOWN { 1,  0,  0,  1,  1}
+#define DJ_MOORE_DOWN { 0,  1, -1, -1,  1}
+#define DI_MOORE_UP   {-1,  0,  0, -1, -1}
+#define DJ_MOORE_UP   { 0,  1, -1, -1,  1}
+// clang-format on
 
 namespace dunescape
 {
@@ -64,7 +54,7 @@ public:
    * @brief Hop length.
    *
    */
-  int hop_length = 5;
+  int hop_length = 1;
 
   /**
    * @brief Probability of sand slab deposit on bare ground.
@@ -104,8 +94,33 @@ public:
    */
   DuneField(std::vector<int> shape);
 
+  /**
+   * @brief Set the dunefield shape.
+   *
+   * @param new_shape New shape.
+   */
+  void set_shape(std::vector<int> new_shape)
+  {
+    this->shape = new_shape;
+    this->h.set_shape(new_shape);
+    this->shadow.set_shape(new_shape);
+  }
+
+  /**
+   * @brief Perform one simulation cycle.
+   *
+   */
   void cycle();
 
+  /**
+   * @brief Depose/erode one sand slab at location `(i, j){.}
+   *
+   * @param i Index.
+   * @param j Index.
+   * @param amount +- 1
+   * @param di Avalanching coefficients for neighbor search.
+   * @param dj Avalanching coefficients for neighbor search.
+   */
   void depose_at(int               i,
                  int               j,
                  int               amount,
@@ -117,6 +132,8 @@ public:
    *
    */
   void update_shadow();
+
+  void update_shadow(int i, int j); ///< @overload
 
 private:
   std::mt19937     gen;

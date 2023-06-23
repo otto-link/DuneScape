@@ -22,7 +22,7 @@ DuneField::DuneField(std::vector<int> shape) : shape(shape)
 void DuneField::cycle()
 {
   std::uniform_real_distribution<float> dis(0.f, 1.f);
-  std::uniform_int_distribution<int>    dis_ij(0, this->shape[0] - 1);
+  std::uniform_int_distribution<int>    dis_ij(0, 10); // this->shape[0] - 1);
 
 #pragma omp parallel for
   for (int i = 0; i < this->shape[0]; i++)
@@ -75,7 +75,7 @@ void DuneField::depose_at(int               i,
   // loop over the neighbors
   int p = i;
   int q = j;
-  
+
   for (size_t k = 0; k < di.size(); k++)
   {
     int in = (i + di[k] + this->shape[0]) % this->shape[0];
@@ -88,13 +88,15 @@ void DuneField::depose_at(int               i,
       break;
     }
   }
-  this->h(p, q) = this->h(p, q) + amount;
+  this->h(p, q) =
+      std::max(0, this->h(p, q) + amount); // need to check this because of OMP
+
+  this->update_shadow(p, q);
 }
 
 void DuneField::update_shadow()
 {
-  int kmax = 1 + (int)((float)this->h.max() / this->shadow_slope);
-  std::vector<float> dh(kmax);
+  int kmax = 2 + (int)((float)this->h.max() / this->shadow_slope);
 
 #pragma omp parallel for
   for (int i = 0; i < this->shape[0]; i++)
@@ -118,6 +120,33 @@ void DuneField::update_shadow()
       if (dh > 0.f)
         this->shadow(i, j) = 1;
     }
+}
+
+void DuneField::update_shadow(int i, int j)
+{
+  int kmax = 2;
+  int imax = 2 + this->h(i, j);
+
+  for (int p = -imax; p < imax; p++)
+  {
+    int   ir = (i + p + this->shape[0]) % this->shape[0];
+    float slope = this->shadow_slope;
+    int   k = 1;
+    float dh = -1.f;
+
+    while ((k < kmax) and (dh <= 0.f))
+    {
+      int k_shifted = (ir - k + this->shape[0]) % this->shape[0];
+      dh = (float)this->h(k_shifted, j) - (float)this->h(ir, j) - slope;
+      slope += this->shadow_slope;
+      k++;
+    }
+
+    if (dh > 0.f)
+      this->shadow(ir, j) = 1;
+    else
+      this->shadow(ir, j) = 0;
+  }
 }
 
 } // namespace dunescape
