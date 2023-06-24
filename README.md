@@ -3,6 +3,8 @@
 # DuneScape
 A minimalist GUI to generate dune fields using cellular automaton.
 
+https://github.com/otto-link/DuneScape/assets/121820229/12f2bf66-c3b0-464a-87e3-97f2db4c424f
+
 # License
 
 This project is licensed under the terms of the MIT license.
