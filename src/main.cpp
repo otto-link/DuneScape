@@ -192,7 +192,7 @@ int main()
       ImGui::SliderInt("Width", &width, 32, 2048);
       ImGui::SliderInt("Height", &height, 32, 2048);
 
-      if ((width != df.shape[0]) or (width != df.shape[1]))
+      if ((width != df.shape[0]) or (height != df.shape[1]))
       {
         width -= width % 32;
         height -= height % 32;
