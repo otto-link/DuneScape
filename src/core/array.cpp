@@ -106,9 +106,9 @@ std::vector<uint8_t> Array::to_img_8bit_nipy()
             rgb[p] = (1.f - t) * colors[ic][p] + t * colors[ic + 1][p];
         }
 
-        data[++k] = (uint8_t)std::floor(255 * rgb[0]);
         data[++k] = (uint8_t)std::floor(255 * rgb[1]);
         data[++k] = (uint8_t)std::floor(255 * rgb[2]);
+        data[++k] = (uint8_t)std::floor(255 * rgb[0]);
       }
   }
   return data;
